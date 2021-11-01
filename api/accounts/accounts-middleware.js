@@ -31,19 +31,35 @@ exports.checkAccountPayload = (req, res, next) => {
   }
 }
 
-exports.checkAccountNameUnique = (req, res, next) => {
-  const { name } = req.body
-  // DO YOUR MAGIC
-  Accounts.getAll()
-    .then(listOfAccounts => {
-      for (let account of listOfAccounts) {
-        if (account.name === name.trim()) {
-          res.status(400).json({ message: "that name is taken" })
-          return
-        }
-      }
+exports.checkAccountNameUnique = async (req, res, next) => {
+  // Q&A PERSON'S CODE
+  // const { name } = req.body
+  // // DO YOUR MAGIC
+  // Accounts.getAll()
+  //   .then(listOfAccounts => {
+  //     for (let account of listOfAccounts) {
+  //       if (account.name === name.trim()) {
+  //         res.status(400).json({ message: "that name is taken" })
+  //         return
+  //       }
+  //     }
+  //     next()
+  //   })
+
+  // GABE'S CODE
+  try {
+    const existing = await db('accounts')
+      .where('name', req.body.name.trim())
+      .first()
+
+    if (existing) {
+      next({ status: 400, message: 'this name is taken' })
+    } else {
       next()
-    })
+    }
+  } catch (err) {
+    next(err)
+  }
 }
 
 exports.checkAccountId = (req, res, next) => {

@@ -20,7 +20,7 @@ router.get('/:id', checkAccountId, (req, res, next) => {
   res.status(200).json(req.account)
 })
 
-router.post('/', checkAccountPayload, (req, res, next) => {
+router.post('/', checkAccountPayload, checkAccountNameUnique, (req, res, next) => {
   // DO YOUR MAGIC
   Accounts.create(req.body)
     .then(account => {
@@ -28,7 +28,7 @@ router.post('/', checkAccountPayload, (req, res, next) => {
     })
 })
 
-router.put('/:id', checkAccountPayload, checkAccountId, (req, res, next) => {
+router.put('/:id', checkAccountPayload, checkAccountId, checkAccountNameUnique, (req, res, next) => {
   // DO YOUR MAGIC
   Accounts.updateById(req.params.id, req.body)
     .then(() => {

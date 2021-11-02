@@ -1,23 +1,24 @@
+const db = require('../../data/db-config')
 const Accounts = require('../accounts/accounts-model');
 const yup = require('yup');
 
 const accountSchema = yup.object().shape({
   name: yup
     .string()
-    .typeError('name of account must be a string')
+    .typeError('must be a string')
     .required('name and budget are required')
     .trim()
     .min(3, 'name of account must be between 3 and 100')
     .max(100, 'name of account must be between 3 and 100'),
   budget: yup
     .number()
-    .typeError('name of account must be a number')
+    .typeError('budget of account must be a number')
     .required('name and budget are required')
     .min(0, 'budget of account is too large or too small')
     .max(1000000, 'budget of account is too large or too small')
 })
 
-exports.checkAccountPayload = (req, res, next) => {
+exports.checkAccountPayload = async (req, res, next) => {
   // DO YOUR MAGIC
   try {
     const validated = await accountSchema.validate(
@@ -46,7 +47,7 @@ exports.checkAccountNameUnique = async (req, res, next) => {
   //     next()
   //   })
 
-  // GABE'S CODE
+  // SOLUTION VIDEO:
   try {
     const existing = await db('accounts')
       .where('name', req.body.name.trim())

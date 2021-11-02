@@ -17,7 +17,12 @@ router.get('/', (req, res, next) => {
 
 router.get('/:id', checkAccountId, (req, res, next) => {
   // DO YOUR MAGIC
-  res.status(200).json(req.account)
+  const { id } = req.params;
+  Accounts.getById(id)
+    .then(account => {
+      res.status(200).json(account)
+    })
+    .catch(next)
 })
 
 router.post('/', checkAccountPayload, checkAccountNameUnique, (req, res, next) => {
@@ -28,7 +33,7 @@ router.post('/', checkAccountPayload, checkAccountNameUnique, (req, res, next) =
     })
 })
 
-router.put('/:id', checkAccountPayload, checkAccountId, checkAccountNameUnique, (req, res, next) => {
+router.put('/:id', checkAccountPayload, checkAccountId, (req, res, next) => {
   // DO YOUR MAGIC
   Accounts.updateById(req.params.id, req.body)
     .then(() => {

@@ -19,7 +19,6 @@ const accountSchema = yup.object().shape({
 })
 
 exports.checkAccountPayload = async (req, res, next) => {
-  // DO YOUR MAGIC
   try {
     const validated = await accountSchema.validate(
       req.body,
@@ -64,7 +63,6 @@ exports.checkAccountNameUnique = async (req, res, next) => {
 }
 
 exports.checkAccountId = (req, res, next) => {
-  // DO YOUR MAGIC
   Accounts.getById(req.params.id)
     .then(accountId => {
       if (!accountId) {

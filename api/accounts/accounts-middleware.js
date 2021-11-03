@@ -1,30 +1,31 @@
 const db = require('../../data/db-config')
 const Accounts = require('../accounts/accounts-model');
-const yup = require('yup');
 
-const accountSchema = yup.object().shape({
-  name: yup
-    .string()
-    .typeError('must be a string')
-    .required('name and budget are required')
-    .trim()
-    .min(3, 'name of account must be between 3 and 100')
-    .max(100, 'name of account must be between 3 and 100'),
-  budget: yup
-    .number()
-    .typeError('budget of account must be a number')
-    .required('name and budget are required')
-    .min(0, 'budget of account is too large or too small')
-    .max(1000000, 'budget of account is too large or too small')
-})
-
-exports.checkAccountPayload = async (req, res, next) => {
+exports.checkAccountPayload = (req, res, next) => {
   try {
-    const validated = await accountSchema.validate(
-      req.body,
-      { strict: false, stripUnknown: true }
-    )
-    req.body = validated
+    if (req.body.name === undefined) {
+      next({ status: 400, message: 'name and budget are required' })
+    } else if (typeof req.body.name !== 'string') {
+      next({ status: 400, message: 'name of account must be a string' })
+    } else if (req.body.name.trim().length < 3) {
+      next({ status: 400, message: 'name of account must be between 3 and 100' })
+    } else if (req.body.name.trim().length > 100) {
+      next({ status: 400, message: 'name of account must be between 3 and 100' })
+    } else if (req.body.budget === undefined) {
+      next({ status: 400, message: 'name and budget are required' })
+    } else if (typeof req.body.budget !== 'number') {
+      next({ status: 400, message: 'budget of account must be a number' })
+    } else if (req.body.budget < 0) {
+      next({ status: 400, message: 'budget of account is too large or too small' })
+    } else if (req.body.budget > 1000000) {
+      next({ status: 400, message: 'budget of account is too large or too small' })
+    }
+    // else {
+    // if (id) {
+    //   req.account = { id, "name": name.trim(), budget };
+    // } else {
+    //   req.account = { "name": name.trim(), budget };
+    // }
     next()
   } catch (err) {
     next({ status: 400, message: err.message })
@@ -32,33 +33,24 @@ exports.checkAccountPayload = async (req, res, next) => {
 }
 
 exports.checkAccountNameUnique = async (req, res, next) => {
-  // Q&A PERSON'S CODE
-  // const { name } = req.body
-  // // DO YOUR MAGIC
-  // Accounts.getAll()
-  //   .then(listOfAccounts => {
-  //     for (let account of listOfAccounts) {
-  //       if (account.name === name.trim()) {
-  //         res.status(400).json({ message: "that name is taken" })
-  //         return
-  //       }
-  //     }
-  //     next()
-  //   })
-
-  // SOLUTION VIDEO:
   try {
     const existing = await db('accounts')
       .where('name', req.body.name.trim())
       .first()
 
     if (existing) {
-      next({ status: 400, message: 'this name is taken' })
+      next({ status: 400, message: 'that name is taken' })
     } else {
+      // req.trimmedName = req.body.name.trim()
+      // console.log(trimmedName)
       next()
     }
+    // const result = await Accounts.create(req.account);
+    // req.newAccountID = result;
+    // next();
   } catch (err) {
     next(err)
+    // res.status(400).json({ message: "that name is taken" });
   }
 }
 
